@@ -14,7 +14,7 @@ function App() {
 					<Route exact path='/' component={Home} />
 					<Route path='/players' component={Players} />
 					<Route path='/teams' component={Teams} />
-					<Route render={() => <h3 className='text-center'>It's the 404, boyz!</h3>} />
+					<Route render={() => <h2 className='text-center'>It's the 404, boyz!</h2>} />
 				</Switch>
 			</div>
 		</Router>
