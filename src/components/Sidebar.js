@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link, Route } from 'react-router-dom';
 import slug from 'slug';
+import Loading from './Loading';
 
 // slug is an external library that we use to make our item snakecase
 Sidebar.propTypes = {
@@ -25,7 +26,7 @@ function CustomLink({ to, children }) {
 // location and match from React Router
 // instead of using NavLink, we are actually going to use a custom link component
 export default function Sidebar({ title, list, loading, location, match}) {
-	return loading === true ? <h1>LOADING</h1> :
+	return loading === true ? <Loading /> :
 	<div>
 		<h3 className="header">{title}</h3>
 		<ul className="sidebar-list">

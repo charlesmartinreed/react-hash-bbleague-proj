@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 import { getTeamNames } from '../api';
 import TeamLogo from './TeamLogo';
 import Team from './Team';
+import Loading from './Loading';
 
 export default class Teams extends Component {
 	state = {
@@ -40,7 +41,7 @@ export default class Teams extends Component {
 				<Route path={`${match.url}/:teamId`} render={({match}) => (
 					<div className="panel">
 						<Team id={match.params.teamId}>
-							{(team) => team === null ? <h1>LOADING</h1> : <div style={{width: '100%'}}>
+							{(team) => team === null ? <Loading /> : <div style={{width: '100%'}}>
 								<TeamLogo id={team.id} className="center" />
 								<h1 className="medium-header">{team.name}</h1>
 								<ul className="info-list row">
