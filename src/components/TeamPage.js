@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { getTeamsArticles } from '../api';
+import { Link, Redirect } from 'react-router-dom';
+import { getTeamsArticles, getTeamNames } from '../api';
 import TeamLogo from './TeamLogo';
 import Team from './Team';
 import slug from 'slug';
@@ -9,22 +9,34 @@ export default class TeamPage extends Component {
 	state = {
 		loading: true,
 		articles: [],
+		teamNames: {},
 	}
 
+ /* check that the team exists*/
 	componentDidMount() {
-		getTeamsArticles(this.props.match.params.teamId)
-			.then((articles) => {
+		Promise.all([
+			getTeamNames(),
+			getTeamsArticles(this.props.match.params.teamId)
+		]).then(([teamNames, articles]) => {
 				this.setState(() => ({
 					articles,
+					teamNames,
 					loading: false,
 				}))
 			})
 	}
-/* link leads to /teamname/articles/article-name */ 
+/* link leads to /teamname/articles/article-name */
+/*  if user tries to go to route that isn't a team, redirect to home page */
 	render() {
-		const { loading, articles } = this.state;
+		const { loading, articles, teamNames } = this.state;
 		const { match } = this.props;
 		const { teamId } = match.params;
+
+		if (
+			loading === false && teamNames.includes(teamId) === false
+		) {
+			return <Redirect to='/' />
+		}
 
 		return (
 			<div>
