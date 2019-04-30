@@ -6,6 +6,9 @@ class App extends Component {
 		return (
 			<Router>
 				<div style={styles.fill}>
+				<Route exact path='/' render={() => (
+					<Redirect to='/hsl/10/90/50' />
+				)} />
 
 				<ul style={styles.nav}>
 					<NavLink to="/hsl/10/90/50">Red</NavLink>
@@ -15,8 +18,12 @@ class App extends Component {
 				</ul>
 
 				<div style={styles.content}>
-					<Route path='/hsl/:h/:s/:l' component={HSL} />
-					<Route path='/rgb/:r/:g/:b' component={RGB} />
+					<Switch>
+						<Route exact path='/hsl/:h/:s/:l' component={HSL} />
+						<Route exact path='/rgb/:r/:g/:b' component={RGB} />
+						<Route render={() => <div>Not Found</div>} />
+					</Switch>
+
 				</div>
 			</div>
 			</Router>
@@ -82,9 +89,7 @@ styles.hsl = {
 
 styles.rgb = {
 	...styles.fill,
-	color: 'white',
-	paddingTop: '20px',
-	fontSize: '30px'
+	...styles.hsl
 }
 
 styles.nav = {
