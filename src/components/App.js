@@ -4,7 +4,8 @@ import {
 	BrowserRouter as Router,
 	Link,
 	Route,
-	Redirect
+	Redirect,
+	withRouter,
 } from 'react-router-dom';
 
 // fake auth service
@@ -73,20 +74,33 @@ const PrivateRoute = ({component: Component, ...rest }) => (
 	)} />
 )
 
+// redirecting with history.push, using withRouter (using withRouter to get router props that we wouldn't normally get since this isn't being rendered via Route...)
+const AuthButton = withRouter(({history}) => (
+	fakeAuth.isAuthenticated === true
+		? <p>
+				Welcome! <button onClick={() => {
+					fakeAuth.signOut(() => history.push('/'))
+				}}>Sign Out</button>
+			</p>
+		: <p>You are not currently logged in.</p>
+
+))
+
 class App extends Component {
 	render() {
 		return (
 			<Router>
-			<div>
-				<ul>
-					<li><Link to='/public'>Public Page</Link></li>
-					<li><Link to='/protected'>Protected Page</Link></li>
-				</ul>
+				<div>
+					<AuthButton />
+					<ul>
+						<li><Link to='/public'>Public Page</Link></li>
+						<li><Link to='/protected'>Protected Page</Link></li>
+					</ul>
 
-				<Route path='/public' component={Public} />
-				<Route path='/login' component={Login} />
-				<PrivateRoute path='/protected' component={Protected} />
-			</div>
+					<Route path='/public' component={Public} />
+					<Route path='/login' component={Login} />
+					<PrivateRoute path='/protected' component={Protected} />
+				</div>
 			</Router>
 		)
 	}
