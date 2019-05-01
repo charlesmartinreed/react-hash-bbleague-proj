@@ -231,6 +231,7 @@ a {
   }
 }
 
+/* REACT TRANSITION GROUP STYLES */
 .fade-enter {
 	opacity: 0;
 	z-index: 1;
@@ -239,4 +240,8 @@ a {
 .fade-enter.fade-enter-active {
 	opacity: 1;
 	transition: opacity 250ms ease-in;
+}
+
+.fade-exit {
+	display: none;
 }
