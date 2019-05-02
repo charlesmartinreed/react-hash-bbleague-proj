@@ -1,109 +1,76 @@
-import React, { Component } from 'react';
-
+import React, { Component } from "react";
 import {
 	BrowserRouter as Router,
-	Link,
 	Route,
-	Redirect,
-	withRouter,
+	Link,
+	Prompt
 } from 'react-router-dom';
 
-// fake auth service
-const fakeAuth = {
-	isAuthenticated: false,
-	authenticate(cb) {
-		this.isAuthenticated = true
-		setTimeout(cb, 100) // fake async
-	},
-	signOut(cb) {
-		this.isAuthenticated = false
-		setTimeout(cb, 100) // again, fake async
-	}
-}
-
-// rendered components - only showing protected when user is authenticated, otherwise redirect to login
-
-const Public = () => <h3>PUBLIC! 👋🏾</h3>
-const Protected = () => <h3>PROTECTED! 🤫</h3>
-
-class Login extends React.Component {
+// state controls whether or not user gets warning prompt when navigating away from Home route
+// if Prompt when attribute === true, show the message
+// if anything is in our input field, isBlocking becomes true
+class Form extends React.Component {
 	state = {
-		redirectToReferrer: false
-	}
-
-	login = () => {
-		fakeAuth.authenticate(() => {
-			this.setState(() => ({
-				redirectToReferrer: true
-			}))
-		})
+		isBlocking: false,
 	}
 
 	render() {
-		const { redirectToReferrer } = this.state;
-		const { from } = this.props.location.state || { from: {
-			pathname: '/'} };
-
-		if (redirectToReferrer === true) {
-			return (
-				<Redirect to={from} />
-			)
-		}
+		const { isBlocking } = this.state;
 
 		return (
-			<div>
-				<p>You must be logged in to view this page {from.pathname}</p>
-				<button onClick={this.login}>Log in</button>
-			</div>
+			<form onSubmit={(event) => {
+				event.preventDefault()
+				event.target.reset()
+				this.setState(() => ({
+					isBlocking: false,
+				}))
+			}}>
+				<Prompt
+					when={isBlocking}
+					message={(location) => `Are you sure you want to go to ${location.pathname}`}
+				/>
+
+				<p>
+					Blocking? {isBlocking === true
+						? 'Yes, click a link or the back button.'
+						: 'Nope!'}
+				</p>
+				<p>
+					<input
+						size="50"
+						placeholder="type something to block transition"
+						onChange={(event) => {
+							const isBlocking = event.target.value.length > 0
+							this.setState(() => ({
+								isBlocking
+							}))
+						}}
+						/>
+					</p>
+					<p>
+						<button>Submit to stop blocking</button>
+					</p>
+			</form>
 		)
 	}
 }
 
-// of course, since React Router doesn't come with a PrivateRoute component, we'll have to build it ourselves, from the Route component
-// when path matches the path passed to private route, render a function. If not authenticated, will redirect user to the protected page.
-// {... props} are the components passed by Route, like location, match...
-// we're passing an object with props.location since this is where the user was attempting to navigate to before authentication
-const PrivateRoute = ({component: Component, ...rest }) => (
-	<Route {...rest} render={(props) => (
-		fakeAuth.isAuthenticated === true
-		? <Component {...props} />
-		: <Redirect to={{
-			pathname: '/login',
-			state: { from: props.location }
-		}}/>
-	)} />
-)
-
-// redirecting with history.push, using withRouter (using withRouter to get router props that we wouldn't normally get since this isn't being rendered via Route...)
-const AuthButton = withRouter(({history}) => (
-	fakeAuth.isAuthenticated === true
-		? <p>
-				Welcome! <button onClick={() => {
-					fakeAuth.signOut(() => history.push('/'))
-				}}>Sign Out</button>
-			</p>
-		: <p>You are not currently logged in.</p>
-
-))
-
-class App extends Component {
-	render() {
-		return (
+export default class App extends Component {
+  render() {
+    return (
 			<Router>
 				<div>
-					<AuthButton />
 					<ul>
-						<li><Link to='/public'>Public Page</Link></li>
-						<li><Link to='/protected'>Protected Page</Link></li>
+						<li><Link to='/'>Form</Link></li>
+						<li><Link to='/one'>One</Link></li>
+						<li><Link to='/two'>Two</Link></li>
 					</ul>
 
-					<Route path='/public' component={Public} />
-					<Route path='/login' component={Login} />
-					<PrivateRoute path='/protected' component={Protected} />
+					<Route exact path='/' component={Form} />
+					<Route path='/one' render={() => <h3>One</h3>} />
+					<Route path='/two' render={() => <h3>Two</h3>} />
 				</div>
 			</Router>
 		)
-	}
+  }
 }
-
-export default App;
